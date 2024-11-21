@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserModel = void 0;
+exports.ContentModel = exports.UserModel = void 0;
 //user model and schema
 const mongoose_1 = __importStar(require("mongoose"));
 mongoose_1.default.connect('mongodb://localhost:27017/secondbrainapp');
@@ -32,3 +32,10 @@ const UserSchema = new mongoose_1.Schema({
     password: String,
 });
 exports.UserModel = (0, mongoose_1.model)("User", UserSchema);
+const contentSchema = new mongoose_1.Schema({
+    title: String,
+    link: String,
+    tags: [{ type: mongoose_1.default.Types.ObjectId, ref: 'Tag' }],
+    userId: { type: mongoose_1.default.Types.ObjectId, ref: 'User', required: true, }
+});
+exports.ContentModel = (0, mongoose_1.model)("Content", contentSchema);
