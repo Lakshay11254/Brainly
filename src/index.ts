@@ -1,9 +1,11 @@
 import express from "express";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
-import { UserModel } from "./db";
+import { ContentModel, UserModel } from "./db";
+import { userMiddleware } from "./middleware";
+import ts from "typescript";
 
-const JWT_PASSWORD = "123123";
+export const JWT_PASSWORD = "123123";
 
 const app = express();
 app.use(express.json());
@@ -55,13 +57,48 @@ app.post("/api/v1/signin", async (req, res) => {
   }
 });
 
-app.post("/api/v1/content", (req, res) => {
-    
+app.post("/api/v1/content", userMiddleware, async (req, res) => {
+    const link = req.body.link;
+    const type = req.body.type;
+
+   await ContentModel.create({
+        link,
+        type,
+        //@ts-ignore
+        userId: req.userId,
+        tags: [],
+    })
+
+res.json({
+    message: "Content Added Successfully",
+});
+})
+
+app.get("/api/v1/content", async (req, res) => {
+     // @ts-ignore
+     const userId = req.userId;
+     const content = await ContentModel.find({
+         userId: userId
+     }).populate("userId", "username")
+     res.json({
+         content
+     })
 });
 
-app.get("/api/v1/content", (req, res) => {});
+app.delete("/api/v1/content", userMiddleware, async (req, res) => {
+    const contentId = req.body.contentId;
 
-app.delete("/api/v1/content", (req, res) => {});
+    await ContentModel.deleteMany({
+        contentId,
+        // @ts-ignore
+        userId: req.userId
+    })
+
+    res.json({
+        message: "Deleted"
+    })
+}
+);
 
 app.post("/api/v1/brain/share", (req, res) => {});
 

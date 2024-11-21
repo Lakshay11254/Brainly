@@ -12,10 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.JWT_PASSWORD = void 0;
 const express_1 = __importDefault(require("express"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = require("./db");
-const JWT_PASSWORD = "123123";
+const middleware_1 = require("./middleware");
+exports.JWT_PASSWORD = "123123";
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.post("/api/v1/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -47,7 +49,7 @@ app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
     if (existingUser) {
         const token = jsonwebtoken_1.default.sign({
             id: existingUser._id,
-        }, JWT_PASSWORD);
+        }, exports.JWT_PASSWORD);
         res.json({
             message: "Sign In Successful",
             token: token,
@@ -59,9 +61,30 @@ app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
     }
 }));
-app.post("/api/v1/content", (req, res) => {
-});
-app.get("/api/v1/content", (req, res) => { });
+app.post("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const link = req.body.link;
+    const type = req.body.type;
+    yield db_1.ContentModel.create({
+        link,
+        type,
+        //@ts-ignore
+        userId: req.userId,
+        tags: [],
+    });
+    res.json({
+        message: "Content Added Successfully",
+    });
+}));
+app.get("/api/v1/content", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // @ts-ignore
+    const userId = req.userId;
+    const content = yield db_1.ContentModel.find({
+        userId: userId
+    }).populate("userId", "username");
+    res.json({
+        content
+    });
+}));
 app.delete("/api/v1/content", (req, res) => { });
 app.post("/api/v1/brain/share", (req, res) => { });
 app.get("/api/v1/brain/:shareLink", (req, res) => { });

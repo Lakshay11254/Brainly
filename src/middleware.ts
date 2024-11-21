@@ -1,9 +1,20 @@
-// import {Model, Schema} from 'mongoose';
+import { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 
-// const UserSchema = new Schema({
-//     username: {type: String, unique: true},
-//     password: String,
+import { JWT_PASSWORD } from "./index";
 
-// })
+export const userMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    const header = req.headers["authorization"];
+    const decoded = jwt.verify(header as string, JWT_PASSWORD)
+    if (decoded) {
+        //@ts-ignore
+        req.userId = decoded.id;
+        next()
+    } else {
+        res.status(403).json({
+            message: "You are not logged in"
+        })
+    }
+}
 
-// export const userModel = new Model( UserSchema, "user")
+// override the types of the express request object
