@@ -3,7 +3,7 @@ import { ReactElement } from "react";
 interface ButtonInterface {
     title: string;
     size: "lg" | "sm" | "md";
-    startIcon?: ReactElement;
+     startIcon?: ReactElement;
     endIcon?: ReactElement;
     variant: "primary" | "secondary";
 }
@@ -17,8 +17,14 @@ const sizeStyles = {
 const variantStyles = {
     "primary": "bg-purple-600 text-white",
     "secondary": "bg-purple-400 text-purple-600",
+    "tertiary": "bg-purple-200 text-purple-600",
+    "danger": "bg-red-600 text-white",
+    "success": "bg-green-600 text-white",
+    "warning": "bg-yellow-600 text-white",
+    "info": "bg-blue-600 text-white",
+    "light": "bg-gray-200 text-gray-800",
 }
-
+ 
 export function Button(props: ButtonInterface) {
 
     return <button className={sizeStyles[props.size] + " " + variantStyles[props.variant]}>
