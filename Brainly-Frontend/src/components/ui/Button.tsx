@@ -22,7 +22,7 @@ const variantStyles = {
     "success": "bg-green-600 text-white",
     "warning": "bg-yellow-600 text-white",
     "info": "bg-blue-600 text-white",
-    "light": "bg-gray-200 text-gray-800",
+    "light": "bg-gray-200 text-gray-800",   
 }
  
 export function Button(props: ButtonInterface) {
