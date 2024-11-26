@@ -17,6 +17,7 @@ const express_1 = __importDefault(require("express"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = require("./db");
 const middleware_1 = require("./middleware");
+const utils_1 = require("./utils");
 exports.JWT_PASSWORD = "123123";
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
@@ -85,7 +86,35 @@ app.get("/api/v1/content", (req, res) => __awaiter(void 0, void 0, void 0, funct
         content
     });
 }));
-app.delete("/api/v1/content", (req, res) => { });
-app.post("/api/v1/brain/share", (req, res) => { });
+app.delete("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const contentId = req.body.contentId;
+    yield db_1.ContentModel.deleteMany({
+        contentId,
+        // @ts-ignore
+        userId: req.userId
+    });
+    res.json({
+        message: "Deleted"
+    });
+}));
+app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const share = req.body.share;
+    if (share) {
+        yield db_1.LinkModel.create({
+            // @ts-ignore
+            userId: req.userId,
+            hash: (0, utils_1.random)(10),
+        });
+    }
+    else {
+        yield db_1.LinkModel.deleteOne({
+            // @ts-ignore
+            userId: req.userId,
+        });
+    }
+    res.json({
+        message: "Updated Sharable Link",
+    });
+}));
 app.get("/api/v1/brain/:shareLink", (req, res) => { });
 app.listen(3000);
